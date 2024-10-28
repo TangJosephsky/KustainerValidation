@@ -1,0 +1,23 @@
+stages:
+- stage: Validate
+  displayName: Validation of detections
+  jobs:
+  - job: ValidateKQLQueries
+    displayName: Validation of KQL against ADX
+    steps:
+    - script: |
+        docker run -e ACCEPT_EULA=Y -m 4G -d -p 8080:8080 -t mcr.microsoft.com/azuredataexplorer/kustainer-linux:latest
+      displayName: Start Kusto Emulator
+    - script: |
+        pip install -r $(System.DefaultWorkingDirectory)/pipelines/testingscripts/requirements.txt
+      displayName: Install python Dependencies
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: $(System.DefaultWorkingDirectory)/pipelines/testingscripts/load_sampledata.py
+      displayName: Load data into Kusto Emulator
+    - task: PythonScript@0
+      inputs:
+        scriptSource: 'filePath'
+        scriptPath: $(System.DefaultWorkingDirectory)/pipelines/testingscripts/run_queries.py
+      displayName: Run & Validate KQL queries
