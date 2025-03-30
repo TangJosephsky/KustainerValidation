@@ -1,0 +1,23 @@
+name: Validate
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Start Kusto Emulator
+        run: docker run -e ACCEPT_EULA=Y -m 4G -d -p 8080:8080 -t mcr.microsoft.com/azuredataexplorer/kustainer-linux:latest
+
+      - name: Install Python Dependencies
+        run: pip install -r pipelines/testingscripts/requirements.txt
+
+      - name: Load data into Kusto Emulator
+        run: python pipelines/testingscripts/load_sampledata.py
+
+      - name: Run & Validate KQL queries
+        run: python pipelines/testingscripts/run_queries.py
