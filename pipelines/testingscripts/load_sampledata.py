@@ -34,8 +34,8 @@ def ingest_data(client, table_name, data):
 def main():
     # Set up Kusto connection
     print("Setting up connection with the ADX cluster...")
-    kcsb = KustoConnectionStringBuilder.with_aad_application_token_authentication(
-        connection_string=KUSTO_EMULATOR_URI, application_token="123456"
+    kcsb = KustoConnectionStringBuilder.with_no_authentication(
+        connection_string=KUSTO_EMULATOR_URI
     )
 
     with KustoClient(kcsb) as client:
